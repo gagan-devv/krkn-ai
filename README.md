@@ -202,6 +202,34 @@ cluster_components:
   - labels:
       kubernetes.io/hostname: node-2
     name: node-2
+
+# Baseline evaluation configuration
+baseline:
+  enable: true
+  duration: 120
+
+# Adaptive mutation dynamically changes mutation rate based on population diversity
+adaptive_mutation:
+  enable: false
+  min: 0.05
+  max: 0.9
+  threshold: 0.1
+  generations: 5
+
+# Stopping criteria configuration
+# Multiple criteria can be set - the algorithm stops when ANY criterion is met
+# stopping_criteria:
+#   # Stop when best fitness score reaches or exceeds this value
+#   fitness_threshold: 0.95
+#
+#   # Stop if best fitness doesn't improve for N consecutive generations
+#   generation_saturation: 10
+#
+#   # Stop if no new unique scenarios are discovered for N consecutive generations
+#   exploration_saturation: 5
+#
+#   # Minimum improvement threshold for generation saturation (default: 0.0001)
+#   saturation_threshold: 0.0001
 ```
 
 You can modify `krkn-ai.yaml` as per your requirement to include/exclude any cluster components, scenarios, fitness function SLOs or health check endpoints for the Krkn-AI testing.
