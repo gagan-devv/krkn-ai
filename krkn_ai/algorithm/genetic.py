@@ -18,7 +18,7 @@ from krkn_ai.models.scenario.base import (
 )
 from krkn_ai.models.scenario.factory import ScenarioFactory
 
-from krkn_ai.models.config import ConfigFile
+from krkn_ai.models.config import ConfigFile, SelectionStrategy
 from krkn_ai.reporter.generations_reporter import GenerationsReporter
 from krkn_ai.reporter.health_check_reporter import HealthCheckReporter
 from krkn_ai.reporter.json_summary_reporter import JSONSummaryReporter
@@ -614,8 +614,41 @@ class GeneticAlgorithm:
 
         return True, new_scenario
 
-    # TODO: Implement a more sophisticated selection method like Tournament Selection for better noise tolerance in fitness scores
     def select_parents(self, fitness_scores: List[CommandRunResult]):
+        """
+        Selects two parents based on the configured selection strategy.
+        """
+        if self.config.selection_strategy == SelectionStrategy.tournament:
+            parent1 = self.tournament_selection(
+                fitness_scores, self.config.tournament_size
+            )
+            parent2 = self.tournament_selection(
+                fitness_scores, self.config.tournament_size
+            )
+            return parent1, parent2
+
+        # Default to Roulette Wheel Selection
+        return self.roulette_wheel_selection(fitness_scores)
+
+    def tournament_selection(
+        self, fitness_scores: List[CommandRunResult], tournament_size: int
+    ):
+        """
+        Selects a parent using Tournament Selection.
+        Randomly picks 'tournament_size' individuals and returns the best one.
+        """
+        population_size = len(fitness_scores)
+        size = min(tournament_size, population_size)
+
+        # Pick random participants uniformly from the population
+        weights = [1.0 / population_size] * population_size
+        participants = rng.choices(items=fitness_scores, weights=weights, k=size)
+
+        # Return the scenario of the participant with the highest fitness score
+        best = max(participants, key=lambda x: x.fitness_result.fitness_score)
+        return best.scenario
+
+    def roulette_wheel_selection(self, fitness_scores: List[CommandRunResult]):
         """
         Selects two parents using Roulette Wheel Selection (proportionate selection).
         Higher fitness means higher chance of being selected.
