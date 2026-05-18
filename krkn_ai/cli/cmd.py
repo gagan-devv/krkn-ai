@@ -110,7 +110,7 @@ def run(
     except KeyError as err:
         logger.error("Unable to parse config file due to missing key: %s", err)
         exit(1)
-    except ValidationError as err:
+    except (ValueError, ValidationError) as err:
         logger.error("Unable to parse config file: %s", err)
         exit(1)
 
