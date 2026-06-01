@@ -34,10 +34,10 @@ def main():
     "--kubeconfig",
     "-k",
     help="Path to cluster kubeconfig file. Setting this will override value in config file.",
-    default=os.getenv("KUBECONFIG", None),
+    envvar="KUBECONFIG",
 )
 @click.option("--config", "-c", help="Path to krkn-ai config file.")
-@click.option("--output", "-o", help="Directory to save results.")
+@click.option("--output", "-o", help="Directory to save results.", default="./")
 @click.option(
     "--format",
     "-f",
@@ -57,7 +57,6 @@ def main():
     "-p",
     multiple=True,
     help="Additional parameters for config file in key=value format.",
-    default=[],
 )
 @click.option(
     "--seed",
@@ -87,7 +86,7 @@ def run(
     output: str = "./",
     format: str = "yaml",
     runner_type: str = None,
-    param: list[str] = None,
+    param: tuple[str, ...] = (),
     seed: int = None,
     verbose: int = 0,  # Default to INFO level
     monitoring: bool = False,
@@ -198,7 +197,7 @@ def monitor(ctx, output: str, port: int):
     "--kubeconfig",
     "-k",
     help="Path to cluster kubeconfig file.",
-    default=os.getenv("KUBECONFIG", None),
+    envvar="KUBECONFIG",
 )
 @click.option(
     "--output", "-o", help="Path to save config file.", default="./krkn-ai.yaml"
@@ -234,8 +233,8 @@ def monitor(ctx, output: str, port: int):
 def discover(
     ctx,
     kubeconfig: str,
-    output: str = "./",
-    namespace: str = "*",
+    output: str = "./krkn-ai.yaml",
+    namespace: str = ".*",
     pod_label: str = ".*",
     node_label: str = ".*",
     verbose: int = 0,
