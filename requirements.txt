@@ -1,7 +1,7 @@
-# Runtime dependencies are declared in pyproject.toml [project].dependencies,
-# which is the single source of truth consumed by both pip and setup.py.
+# Runtime dependencies are declared in pyproject.toml [project].dependencies.
+# Dev dependencies are in [project.optional-dependencies].dev.
 #
 # This file exists as a convenience for contributors so that:
 #   pip install -r requirements.txt
-# installs the package (and all its runtime deps) in editable mode.
--e .
+# installs the package with all runtime and dev deps in editable mode.
+-e .[dev]
