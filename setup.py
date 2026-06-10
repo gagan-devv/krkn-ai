@@ -7,8 +7,16 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file (read as UTF-8 to avoid Windows encoding errors)
 DESCRIPTION = (HERE / "README.md").read_text(encoding="utf-8")
 
-# The text of the requirements file
-REQUIRE = (HERE / "requirements.txt").read_text(encoding="utf-8")
+# Parse requirements.txt into a list of package specifiers.
+# NOTE: read_text() returns a raw str; passing that directly to install_requires
+# causes setuptools to iterate over individual characters rather than package
+# names, silently skipping every dependency.  We must split into lines and
+# filter out blank lines and comments.
+REQUIRE = [
+    line.strip()
+    for line in (HERE / "requirements.txt").read_text(encoding="utf-8").splitlines()
+    if line.strip() and not line.strip().startswith("#")
+]
 
 setup(
     name="krkn_ai",
