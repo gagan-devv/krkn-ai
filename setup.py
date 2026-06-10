@@ -1,4 +1,5 @@
 import pathlib
+import tomllib
 from setuptools import setup, find_packages
 
 # The directory containing this file
@@ -7,16 +8,12 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file (read as UTF-8 to avoid Windows encoding errors)
 DESCRIPTION = (HERE / "README.md").read_text(encoding="utf-8")
 
-# Parse requirements.txt into a list of package specifiers.
-# NOTE: read_text() returns a raw str; passing that directly to install_requires
-# causes setuptools to iterate over individual characters rather than package
-# names, silently skipping every dependency.  We must split into lines and
-# filter out blank lines and comments.
-REQUIRE = [
-    line.strip()
-    for line in (HERE / "requirements.txt").read_text(encoding="utf-8").splitlines()
-    if line.strip() and not line.strip().startswith("#")
-]
+# Single source of truth: read runtime dependencies from pyproject.toml
+# [project].dependencies so that setup.py and pyproject.toml never diverge.
+# tomllib is part of the stdlib since Python 3.11 (matches requires-python).
+with open(HERE / "pyproject.toml", "rb") as _f:
+    _pyproject = tomllib.load(_f)
+REQUIRE = _pyproject["project"]["dependencies"]
 
 setup(
     name="krkn_ai",
