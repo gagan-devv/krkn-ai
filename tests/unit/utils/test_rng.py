@@ -1,4 +1,10 @@
+from pydantic import BaseModel
 from krkn_ai.utils.rng import RNG
+
+
+class DummyPydanticModel(BaseModel):
+    value: int
+    nested: list[int] = [1, 2, 3]
 
 
 class TestRNG:
@@ -55,6 +61,17 @@ class TestRNG:
         choice2 = rng.choice(items)
         assert choice == choice2
 
+    def test_choice_pydantic_compatibility(self):
+        """Test choice() works with Pydantic models (prevents NumPy array conversion failure)."""
+        rng = RNG(42)
+        models = [
+            DummyPydanticModel(value=1),
+            DummyPydanticModel(value=2),
+            DummyPydanticModel(value=3),
+        ]
+        choice = rng.choice(models)
+        assert choice in models
+
     def test_choices(self):
         """Test choices() picks multiple elements with weights."""
         rng = RNG(42)
@@ -71,6 +88,19 @@ class TestRNG:
         rng.set_seed(42)
         choices2 = rng.choices(items, weights, k=5)
         assert choices == choices2
+
+    def test_choices_pydantic_compatibility(self):
+        """Test choices() works with Pydantic models (prevents NumPy array conversion failure)."""
+        rng = RNG(42)
+        models = [
+            DummyPydanticModel(value=1),
+            DummyPydanticModel(value=2),
+            DummyPydanticModel(value=3),
+        ]
+        weights = [0.1, 0.8, 0.1]
+        choices = rng.choices(models, weights, k=5)
+        assert len(choices) == 5
+        assert all(c in models for c in choices)
 
     def test_randint_returns_int_in_inclusive_range(self):
         """Test randint() returns an integer within [low, high] inclusive."""

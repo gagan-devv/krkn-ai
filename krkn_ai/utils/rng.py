@@ -24,10 +24,14 @@ class RNG:
 
     def choice(self, items: Sequence[T]) -> T:
         """Return a random element from the given non-empty sequence. The return type is inferred from the list type."""
-        return self.rng.choice(items)
+        if not items:
+            raise ValueError("Cannot select from an empty sequence")
+        idx = self.rng.integers(0, len(items))
+        return items[idx]
 
     def choices(self, items: List[Any], weights: List[float], k: int = 1):
-        return list(self.rng.choice(items, p=weights, size=k))
+        indices = list(self.rng.choice(len(items), p=weights, size=k))
+        return [items[i] for i in indices]
 
     def randint(self, low: int, high: int) -> int:
         """Return a random integer N such that low <= N <= high (both inclusive).
