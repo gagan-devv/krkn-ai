@@ -72,6 +72,27 @@ class TestRNG:
         choice = rng.choice(models)
         assert choice in models
 
+    def test_choice_numpy_array_compatibility(self):
+        """Test choice() works with numpy arrays (both 1D and object arrays)."""
+        import numpy as np
+
+        rng = RNG(42)
+        arr = np.array([10, 20, 30])
+        choice = rng.choice(arr)
+        assert choice in [10, 20, 30]
+
+    def test_choice_empty_sequence_raises_value_error(self):
+        """Test choice() raises ValueError when passed an empty sequence or empty numpy array."""
+        import numpy as np
+
+        rng = RNG(42)
+        import pytest
+
+        with pytest.raises(ValueError, match="Cannot select from an empty sequence"):
+            rng.choice([])
+        with pytest.raises(ValueError, match="Cannot select from an empty sequence"):
+            rng.choice(np.array([]))
+
     def test_choices(self):
         """Test choices() picks multiple elements with weights."""
         rng = RNG(42)
@@ -101,6 +122,29 @@ class TestRNG:
         choices = rng.choices(models, weights, k=5)
         assert len(choices) == 5
         assert all(c in models for c in choices)
+
+    def test_choices_numpy_array_compatibility(self):
+        """Test choices() works with numpy arrays."""
+        import numpy as np
+
+        rng = RNG(42)
+        arr = np.array([10, 20, 30])
+        weights = [0.2, 0.6, 0.2]
+        choices = rng.choices(arr, weights, k=5)
+        assert len(choices) == 5
+        assert all(c in [10, 20, 30] for c in choices)
+
+    def test_choices_empty_sequence_raises_value_error(self):
+        """Test choices() raises ValueError when passed an empty sequence or empty numpy array."""
+        import numpy as np
+
+        rng = RNG(42)
+        import pytest
+
+        with pytest.raises(ValueError, match="Cannot select from an empty sequence"):
+            rng.choices([], [1.0], k=2)
+        with pytest.raises(ValueError, match="Cannot select from an empty sequence"):
+            rng.choices(np.array([]), [], k=2)
 
     def test_randint_returns_int_in_inclusive_range(self):
         """Test randint() returns an integer within [low, high] inclusive."""

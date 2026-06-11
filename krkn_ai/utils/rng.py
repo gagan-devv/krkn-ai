@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Any, Optional
+from typing import List, Optional
 from typing import TypeVar, Sequence
 
 T = TypeVar("T")
@@ -24,12 +24,14 @@ class RNG:
 
     def choice(self, items: Sequence[T]) -> T:
         """Return a random element from the given non-empty sequence. The return type is inferred from the list type."""
-        if not items:
+        if len(items) == 0:
             raise ValueError("Cannot select from an empty sequence")
         idx = self.rng.integers(0, len(items))
         return items[idx]
 
-    def choices(self, items: List[Any], weights: List[float], k: int = 1):
+    def choices(self, items: Sequence[T], weights: List[float], k: int = 1) -> List[T]:
+        if len(items) == 0:
+            raise ValueError("Cannot select from an empty sequence")
         indices = list(self.rng.choice(len(items), p=weights, size=k))
         return [items[i] for i in indices]
 
